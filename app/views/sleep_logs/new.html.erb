@@ -1,0 +1,61 @@
+<div class="sleep-log-app">
+	<header class="site-header"><div class="page-shell header-inner">
+		<%= link_to root_path, class: "brand", aria: { label: "ねむログ ホーム" } do %>
+			<span class="brand-mark">☾</span>
+			<span><strong>ねむログ</strong><small>睡眠・服薬シンプル記録</small></span>
+		<% end %>
+		<%= link_to "一覧に戻る", root_path, class: "logout-button" %>
+	</div></header>
+
+	<main class="page-shell main-content">
+		<section class="panel record-panel">
+			<div class="section-heading">
+				<div>
+					<h1><span class="heading-icon amber">✎</span> <%= if @sleep_log.persisted?; "記録を編集する"; elsif @sleep_log.sleep_date == Date.current; "今日の体調を記録する"; else; "#{l(@sleep_log.sleep_date, format: "%-m月%-d日")}の体調を記録する"; end %></h1>
+					<p>体調や眠気を記録して、診察時に振り返りやすくしましょう。</p>
+				</div>
+				<p class="date-label"><%= l(@sleep_log.sleep_date, format: "%Y年%-m月%-d日 (%a)") %></p>
+			</div>
+
+			<% if @sleep_log.errors.any? %>
+				<div class="form-errors" role="alert">入力内容を確認してください。</div>
+			<% end %>
+
+			<%= form_with model: @sleep_log, class: "record-form" do |form| %>
+				<%= form.hidden_field :sleep_date %>
+				<fieldset class="medicine-fieldset">
+					<legend>昨夜のお薬</legend>
+					<div class="choice-grid two-columns">
+						<label class="choice-card"><%= form.radio_button :medicine_taken, true %><span>〇 服用した</span></label>
+						<label class="choice-card"><%= form.radio_button :medicine_taken, false %><span>× 服用しなかった</span></label>
+					</div>
+				</fieldset>
+
+				<fieldset class="sleep-duration-fieldset">
+					<%= form.label :actual_sleep_time, "本日の睡眠時間" %>
+					<%= form.select :actual_sleep_time, options_for_select((0..20).map { |slot| hours = slot / 2.0; ["#{hours % 1 == 0 ? hours.to_i : hours}h", slot * 30] }, @sleep_log.actual_sleep_time), {}, class: "sleep-duration-select" %>
+				</fieldset>
+
+				<fieldset>
+					<legend>今朝の目覚め・気分</legend>
+					<div class="condition-grid">
+						<% [[1, "😴", "かなり重い"], [2, "🥱", "ややだるい"], [3, "😐", "普通"], [4, "😊", "すっきり"], [5, "✨", "とても快適"]].each do |score, emoji, label| %>
+							<label class="condition-button">
+								<%= form.radio_button :condition, score, class: "visually-hidden" %><b><%= emoji %></b><span><%= label %></span>
+							</label>
+						<% end %>
+					</div>
+				</fieldset>
+
+				<div class="sleepiness-field">
+					<div class="field-row"><%= form.label :sleepiness, "日中の眠気レベル" %><output><%= @sleep_log.sleepiness %> / 5</output></div>
+					<%= form.range_field :sleepiness, min: 1, max: 5 %>
+					<div class="range-labels"><span>全くない</span><span>強烈な眠気</span></div>
+				</div>
+
+				<%= form.submit(@sleep_log.persisted? ? "✓ 変更を保存する" : "✓ 記録を保存する", class: "primary-button") %>
+			<% end %>
+		</section>
+	</main>
+	<footer class="site-footer">SleepLog - UI Prototype for User Interview</footer>
+</div>

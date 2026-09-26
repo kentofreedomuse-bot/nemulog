@@ -1,0 +1,128 @@
+<% today = Date.current %>
+<% recent_dates = (0..6).map { |days_ago| today - days_ago } %>
+
+<div class="sleep-log-app" data-controller="sleep-log">
+	<header class="site-header"><div class="page-shell header-inner">
+		<a href="<%= root_path %>" class="brand" aria-label="ねむログ ホーム">
+      <span class="brand-mark">☾</span>
+      <span><strong>ねむログ</strong>
+      <small>睡眠・服薬シンプル記録</small></span>
+    </a>
+		<div class="header-actions">
+      <%= link_to "✎ 体調を記録する", new_sleep_log_path, class: "record-button" %>
+      <%= button_to "ログアウト", destroy_user_session_path, method: :delete, class: "logout-button" %>
+    </div>
+	</div></header>
+
+	<main class="page-shell main-content">
+		<section class="welcome-banner">
+      <div><p>こんにちは、<%= current_user&.nickname.presence || "ユーザー" %>さん</p>
+        <h1>今週は4日連続で記録できています！</h1>
+        <span>少しずつ自分のパターンがつかめてきましたね。</span>
+      </div><span class="welcome-sprout">🌱</span>
+    </section>
+
+		<section class="panel">
+      <div class="section-heading">
+        <div>
+          <h2><span class="heading-icon indigo">⌁</span> 今週の睡眠と気分の変化</h2><p>💊 マークは薬を服用した日です</p>
+        </div>
+        <select class="period-select" aria-label="表示期間">
+          <option>直近1週間</option>
+          <option>直近2週間</option>
+          <option>今月</option>
+        </select>
+      </div>
+			<div class="trend-chart">
+        <div class="chart-y-labels">
+          <span>10h</span>
+          <span>7.5h</span>
+          <span>5h</span>
+          <span>2.5h</span>
+          <span>0h</span>
+        </div>
+        <div class="chart-area">
+          <div class="chart-gridlines">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </div>
+          <div class="bars">
+            <% @chart_dates.each do |date| %>
+              <% log = @chart_logs[date] %>
+              <i style="--height:<%= log ? [[log.actual_sleep_time.to_f / 600 * 100, 100].min, 0].max : 0 %>%" title="<%= log ? "#{log.actual_sleep_time / 60.0}時間" : "記録なし" %>"></i>
+            <% end %>
+          </div>
+          <div class="mood-line">
+            <% @chart_dates.each_with_index do |date, index| %>
+              <% log = @chart_logs[date] %>
+              <% if log %>
+                <i style="--x:<%= (index + 0.5) * 100.0 / 7 %>%;--y:<%= (5 - log.condition) * 25 %>%" title="<%= "目覚め・気分: #{log.condition} / 5" %>"></i>
+              <% end %>
+            <% end %>
+          </div>
+          <div class="chart-x-labels">
+            <% @chart_dates.each do |date| %>
+              <% log = @chart_logs[date] %>
+              <% if log %>
+                <%= link_to l(date, format: "%-m/%-d(%a)"), edit_sleep_log_path(log), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を編集" } %>
+              <% else %>
+                <%= link_to l(date, format: "%-m/%-d(%a)"), new_sleep_log_path(date: date), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を作成" } %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <span>▮ 睡眠時間</span>
+        <span>● 目覚めの気分</span>
+      </div>
+    </section>
+
+    <section class="summary-panel">
+      <div class="summary-header">
+        <div>
+          <span class="doctor-tag">医師へ見せる用</span>
+          <h2>診察用サマリー（過去1週間）</h2>
+        </div>
+        <span class="doctor-icon">♙</span>
+      </div>
+      <div class="summary-box">
+        <strong>💡 過去7日間の自動まとめ：</strong>
+        <ul>
+          <li>服薬回数：7日中 <b>5日</b></li>
+          <li>服薬した日は平均 <b>6.5時間</b> 睡眠で目覚め「普通」</li>
+          <li>服薬しない日は睡眠不足（4時間）になりやすく、翌日の眠気レベルが上昇傾向</li>
+        </ul>
+      </div>
+      <button type="button" class="secondary-button" data-action="click->sleep-log#openModal">↗ 診察提示用の拡大画面を開く</button>
+    </section>
+
+    <section class="panel history-panel">
+      <h2><span class="heading-icon slate">↺</span> 最近の履歴</h2>
+      <div class="history-list">
+        <div class="history-row">
+          <b>😐</b>
+          <div>
+            <strong><%= l(recent_dates[1], format: "%-m月%-d日 (%a)") %></strong>
+            <small>服薬: 23:15 / 眠気: 中程度</small>
+          </div>
+          <span class="status taken">💊 服用あり</span>
+        </div>
+        <div class="history-row">
+          <b>🥱</b>
+          <div>
+            <strong><%= l(recent_dates[2], format: "%-m月%-d日 (%a)") %></strong>
+            <small>服薬: なし / 眠気: やや強い</small>
+          </div>
+          <span class="status missed">服用なし</span>
+        </div>
+
+    
+	</main>
+
+	<div class="modal-backdrop" data-sleep-log-target="modal" data-action="click->sleep-log#closeOnBackdrop" hidden><section class="doctor-modal" role="dialog" aria-modal="true" aria-labelledby="doctor-report-title"><div class="modal-heading"><h2 id="doctor-report-title">🏥 診察用レポート（先生へ提示）</h2><button type="button" class="close-button" data-action="click->sleep-log#closeModal" aria-label="閉じる">×</button></div><div class="patient-box"><strong>患者名：田中 太郎 (28歳)</strong><span>集計期間：2026/08/17 〜 2026/08/24 (8日間)</span></div><dl class="report-stats"><div><dt>処方薬の服用率:</dt><dd>6日 / 8日 (75%)</dd></div><div><dt>平均睡眠時間:</dt><dd>6.2 時間</dd></div><div><dt>起床時のだるさ（平均）:</dt><dd class="amber-text">やや軽減傾向</dd></div><div><dt>日中の眠気のピーク:</dt><dd>14:00〜16:00</dd></div></dl><div class="symptom-note"><strong>気になっているメモ・症状:</strong><p>「薬を飲んだ翌朝は比較的起きやすいが、15時ごろに強烈な眠気が来ることがある。薬の量を調整できるか相談したい。」</p></div><button type="button" class="modal-close-button" data-action="click->sleep-log#closeModal">閉じる</button></section></div>
+	<footer class="site-footer">SleepLog - UI Prototype for User Interview</footer>
+</div>
