@@ -1,4 +1,4 @@
-<div class="sleep-log-app">
+<div class="sleep-log-app" data-controller="sleep-log">
 	<header class="site-header"><div class="page-shell header-inner">
 		<%= link_to root_path, class: "brand", aria: { label: "ねむログ ホーム" } do %>
 			<span class="brand-mark">☾</span>
@@ -48,8 +48,8 @@
 				</fieldset>
 
 				<div class="sleepiness-field">
-					<div class="field-row"><%= form.label :sleepiness, "日中の眠気レベル" %><output><%= @sleep_log.sleepiness %> / 5</output></div>
-					<%= form.range_field :sleepiness, min: 1, max: 5 %>
+					<div class="field-row"><%= form.label :sleepiness, "日中の眠気レベル" %><output data-sleep-log-target="sleepinessValue"><%= sleepiness_label(@sleep_log.sleepiness) %></output></div>
+					<%= form.range_field :sleepiness, min: 1, max: 5, data: { action: "input->sleep-log#updateSleepiness" } %>
 					<div class="range-labels"><span>全くない</span><span>強烈な眠気</span></div>
 				</div>
 
