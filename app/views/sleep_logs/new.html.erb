@@ -14,7 +14,7 @@
 					<h1><span class="heading-icon amber">✎</span> <%= if @sleep_log.persisted?; "記録を編集する"; elsif @sleep_log.sleep_date == Date.current; "今日の体調を記録する"; else; "#{l(@sleep_log.sleep_date, format: "%-m月%-d日")}の体調を記録する"; end %></h1>
 					<p>体調や眠気を記録して、診察時に振り返りやすくしましょう。</p>
 				</div>
-				<p class="date-label"><%= l(@sleep_log.sleep_date, format: "%Y年%-m月%-d日 (%a)") %></p>
+				<p class="date-label"><%= "#{l(@sleep_log.sleep_date, format: "%Y年%-m月%-d日")} (#{japanese_weekday(@sleep_log.sleep_date)})" %></p>
 			</div>
 
 			<% if @sleep_log.errors.any? %>
