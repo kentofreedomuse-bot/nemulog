@@ -469,14 +469,20 @@ input[type="range"] {
 }
 
 .chart-y-labels {
-  width: 30px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-bottom: 26px;
+  position: relative;
+  flex: 0 0 30px;
+  height: calc(100% - 30px);
   color: var(--faint);
   font-size: 10px;
   text-align: right;
+}
+
+.chart-y-labels span {
+  position: absolute;
+  top: var(--position);
+  right: 0;
+  transform: translateY(-50%);
+  white-space: nowrap;
 }
 
 .chart-area {
@@ -484,14 +490,14 @@ input[type="range"] {
   flex: 1;
   min-width: 0;
   margin-left: 9px;
-  padding-bottom: 26px;
+  padding-bottom: 30px;
 }
 
 .chart-gridlines,
 .bars,
 .mood-line {
   position: absolute;
-  inset: 0 0 26px;
+  inset: 0 0 30px;
 }
 
 .chart-gridlines {
@@ -547,6 +553,19 @@ input[type="range"] {
   color: var(--muted);
   font-size: 9px;
   text-align: center;
+}
+
+.chart-date-item {
+  display: grid;
+  grid-template-rows: 14px auto;
+  justify-items: center;
+  row-gap: 1px;
+}
+
+.medicine-mark {
+  height: 14px;
+  font-size: 11px;
+  line-height: 14px;
 }
 
 .chart-date-link {

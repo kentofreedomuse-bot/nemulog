@@ -35,14 +35,13 @@
       </div>
 			<div class="trend-chart">
         <div class="chart-y-labels">
-          <span>10h</span>
-          <span>7.5h</span>
-          <span>5h</span>
-          <span>2.5h</span>
-          <span>0h</span>
+          <% [["10h", 0], ["8h", 20], ["6h", 40], ["4h", 60], ["2h", 80], ["0h", 100]].each do |label, position| %>
+            <span style="--position:<%= position %>%"><%= label %></span>
+          <% end %>
         </div>
         <div class="chart-area">
           <div class="chart-gridlines">
+            <i></i>
             <i></i>
             <i></i>
             <i></i>
@@ -66,11 +65,14 @@
           <div class="chart-x-labels">
             <% @chart_dates.each do |date| %>
               <% log = @chart_logs[date] %>
-              <% if log %>
-                <%= link_to l(date, format: "%-m/%-d(%a)"), edit_sleep_log_path(log), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を編集" } %>
-              <% else %>
-                <%= link_to l(date, format: "%-m/%-d(%a)"), new_sleep_log_path(date: date), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を作成" } %>
-              <% end %>
+              <div class="chart-date-item">
+                <span class="medicine-mark" <%= "aria-label=\"昨夜の薬を服用\"" if log&.medicine_taken? %>><%= "💊" if log&.medicine_taken? %></span>
+                <% if log %>
+                  <%= link_to "#{l(date, format: "%-m/%-d")}(#{japanese_weekday(date)})", edit_sleep_log_path(log), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を編集" } %>
+                <% else %>
+                  <%= link_to "#{l(date, format: "%-m/%-d")}(#{japanese_weekday(date)})", new_sleep_log_path(date: date), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を作成" } %>
+                <% end %>
+              </div>
             <% end %>
           </div>
         </div>
@@ -106,7 +108,7 @@
         <div class="history-row">
           <b>😐</b>
           <div>
-            <strong><%= l(recent_dates[1], format: "%-m月%-d日 (%a)") %></strong>
+            <strong><%= "#{l(recent_dates[1], format: "%-m月%-d日")} (#{japanese_weekday(recent_dates[1])})" %></strong>
             <small>服薬: 23:15 / 眠気: 中程度</small>
           </div>
           <span class="status taken">💊 服用あり</span>
@@ -114,7 +116,7 @@
         <div class="history-row">
           <b>🥱</b>
           <div>
-            <strong><%= l(recent_dates[2], format: "%-m月%-d日 (%a)") %></strong>
+            <strong><%= "#{l(recent_dates[2], format: "%-m月%-d日")} (#{japanese_weekday(recent_dates[2])})" %></strong>
             <small>服薬: なし / 眠気: やや強い</small>
           </div>
           <span class="status missed">服用なし</span>
