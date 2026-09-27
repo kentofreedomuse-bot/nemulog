@@ -8,6 +8,10 @@ class SleepLogsController < ApplicationController
                               .where(sleep_date: @chart_dates)
                               .order(:created_at)
                               .index_by(&:sleep_date)
+    @recent_logs = @chart_logs.values
+    @medicine_taken_logs = @recent_logs.select(&:medicine_taken?)
+    @medicine_not_taken_logs = @recent_logs.reject(&:medicine_taken?)
+    @medicine_taken_count = @medicine_taken_logs.count
     @sleep_logs = current_user.sleep_logs.order(sleep_date: :desc)
   end
 
