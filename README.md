@@ -8,14 +8,14 @@
 https://nemulog.onrender.com
 
 # テスト用アカウント
-BASIC認証ID:admin
-BASIC認証PASSWORD:K21612261
-e-mail:test@example.com
-password:testnemulog
+BASIC認証ID:admin  
+BASIC認証PASSWORD:K21612261  
+e-mail:test@example.com  
+password:testnemulog  
 
 # 今後の実装予定
-・入眠時間の入力欄追加
-・薬の書類の入力欄追加、薬ごとのソート
+・入眠時間の入力欄追加  
+・薬の書類の入力欄追加、薬ごとのソート  
 ・グラフの表示期間切り替え
 
 # テーブル設計
