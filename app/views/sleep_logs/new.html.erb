@@ -32,7 +32,7 @@
 				</fieldset>
 
 				<fieldset class="sleep-duration-fieldset">
-					<%= form.label :actual_sleep_time, "本日の睡眠時間" %>
+					<%= form.label :actual_sleep_time, "昨日の睡眠時間" %>
 					<%= form.select :actual_sleep_time, options_for_select((0..20).map { |slot| hours = slot / 2.0; ["#{hours % 1 == 0 ? hours.to_i : hours}h", slot * 30] }, @sleep_log.actual_sleep_time), {}, class: "sleep-duration-select" %>
 				</fieldset>
 
