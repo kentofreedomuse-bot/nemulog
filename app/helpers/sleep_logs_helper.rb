@@ -25,6 +25,10 @@ module SleepLogsHelper
 		sleepiness_labels[value.to_i]
 	end
 
+	def condition_label(value)
+		condition_labels[value.to_i]
+	end
+
 	def weekly_record_message(logs)
 		case logs.size
 		when 0

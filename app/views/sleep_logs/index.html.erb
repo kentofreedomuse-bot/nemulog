@@ -115,22 +115,24 @@
     <section class="panel history-panel">
       <h2><span class="heading-icon slate">↺</span> 最近の履歴</h2>
       <div class="history-list">
-        <div class="history-row">
-          <b>😐</b>
-          <div>
-            <strong><%= "#{l(recent_dates[1], format: "%-m月%-d日")} (#{japanese_weekday(recent_dates[1])})" %></strong>
-            <small>服薬: 23:15 / 眠気: 中程度</small>
-          </div>
-          <span class="status taken">💊 服用あり</span>
-        </div>
-        <div class="history-row">
-          <b>🥱</b>
-          <div>
-            <strong><%= "#{l(recent_dates[2], format: "%-m月%-d日")} (#{japanese_weekday(recent_dates[2])})" %></strong>
-            <small>服薬: なし / 眠気: やや強い</small>
-          </div>
-          <span class="status missed">服用なし</span>
-        </div>
+        <% if @sleep_logs.any? %>
+          <% @sleep_logs.each do |log| %>
+            <div class="history-row">
+              <b><%= { 1 => "😴", 2 => "🥱", 3 => "😐", 4 => "😊", 5 => "✨" }[log.condition] %></b>
+              <div>
+                <strong><%= link_to "#{l(log.sleep_date, format: "%-m月%-d日")} (#{japanese_weekday(log.sleep_date)})", edit_sleep_log_path(log) %></strong>
+                <small>睡眠: <%= (log.actual_sleep_time.to_f / 60).round(1) %>時間 / 眠気: <%= sleepiness_label(log.sleepiness) %> / 気分: <%= condition_label(log.condition) %></small>
+              </div>
+              <% if log.medicine_taken? %>
+                <span class="status taken">💊 服用あり</span>
+              <% else %>
+                <span class="status missed">服用なし</span>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p>まだ記録がありません。</p>
+        <% end %>
 
     
 	</main>

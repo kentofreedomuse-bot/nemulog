@@ -12,7 +12,7 @@ class SleepLogsController < ApplicationController
     @medicine_taken_logs = @recent_logs.select(&:medicine_taken?)
     @medicine_not_taken_logs = @recent_logs.reject(&:medicine_taken?)
     @medicine_taken_count = @medicine_taken_logs.count
-    @sleep_logs = current_user.sleep_logs.order(sleep_date: :desc)
+    @sleep_logs = current_user.sleep_logs.order(sleep_date: :desc, created_at: :desc).limit(5)
   end
 
   def new
