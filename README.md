@@ -44,10 +44,11 @@ https://gyazo.com/a0cc3d3354bc97992e6baaa182ca56c5
 https://gyazo.com/0ae2dc9f4eb94b66b829cfa56fc1fad5
 ## 診察用サマリー・最近の履歴
 https://gyazo.com/79ccd2d1f9b9d302368935dae3a66167
+
+
 # テーブル設計
 
 ## users
-
 | Column             | Type   | Options     |
 | ------------------ | ------ | ----------- |
 | nickname           | string | null: false |
@@ -60,7 +61,6 @@ https://gyazo.com/79ccd2d1f9b9d302368935dae3a66167
 
 
 ## sleep_logs
-
 | Column                | Type       | Options                        |
 | --------------------- | ---------- | ------------------------------ |
 | user                  | references | null: false, foreign_key: true |
@@ -74,6 +74,9 @@ https://gyazo.com/79ccd2d1f9b9d302368935dae3a66167
 
 ### Association
 - belongs_to :user
+
+# ER図
+https://gyazo.com/e4e78fa9faf81229935b421c11d9f9f8
 
 # 使用言語
 ・HTML  
