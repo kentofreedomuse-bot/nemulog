@@ -33,6 +33,17 @@ https://docs.google.com/spreadsheets/d/1dWzJcBoU3ADSdeUtqnD1rD6e7dpdZykzdBKxp_op
 ・薬の書類の入力欄追加、薬ごとのソート  
 ・グラフの表示期間切り替え
 
+# アプリ挙動
+## 新規登録
+https://gyazo.com/089e653e663c34ac1b9aa83a95a5bc0d
+## ログイン・ログアウト
+https://gyazo.com/ee3b645acb162dd1ad430952f11879b5
+## 体調記録画面への遷移
+https://gyazo.com/a0cc3d3354bc97992e6baaa182ca56c5
+## 体調の記録・グラフへの反映
+https://gyazo.com/0ae2dc9f4eb94b66b829cfa56fc1fad5
+## 診察用サマリー・最近の履歴
+https://gyazo.com/79ccd2d1f9b9d302368935dae3a66167
 # テーブル設計
 
 ## users
@@ -69,3 +80,13 @@ https://docs.google.com/spreadsheets/d/1dWzJcBoU3ADSdeUtqnD1rD6e7dpdZykzdBKxp_op
 ・CSS  
 ・Ruby on Rails  
 ・JavaScript
+
+# 工夫した点
+・一番上のメッセージを常にポジティブな表現に  
+たとえ記録を忘れてしまってもモチベーションを保つように
+
+・グラフで記録を可視化  
+睡眠時間・薬の服用の有無・目覚めの気分の因果が見えるようになる  
+
+・操作が複雑になりすぎないように構成  
+睡眠不足や薬の副作用時でも継続して記録できるように
