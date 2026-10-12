@@ -26,15 +26,15 @@
 		<section class="panel">
       <div class="section-heading">
         <div>
-          <h2><span class="heading-icon indigo">⌁</span> 今週の睡眠と気分の変化</h2><p>💊 マークは薬を服用した日です</p>
+          <h2><span class="heading-icon indigo">⌁</span> <%= ["今月", "先月", "先々月"][@month_offset] %>の睡眠と気分の変化</h2><p>💊 マークは薬を服用した日です</p>
         </div>
-        <select class="period-select" aria-label="表示期間">
-          <option>直近1週間</option>
-          <option>直近2週間</option>
-          <option>過去1か月</option>
-          <option>過去2か月</option>
-          <option>過去3か月</option>
-        </select>
+        <%= form_with url: root_path, method: :get, local: true do %>
+          <%= select_tag :month,
+            options_for_select([["今月", 0], ["先月", 1], ["先々月", 2]], @month_offset),
+            class: "period-select",
+            aria: { label: "表示期間" },
+            data: { action: "change->sleep-log#changePeriod" } %>
+        <% end %>
       </div>
 			<div class="trend-chart">
         <div class="chart-y-labels">
@@ -42,48 +42,50 @@
             <span style="--position:<%= position %>%"><%= label %></span>
           <% end %>
         </div>
-        <div class="chart-area">
-          <div class="chart-gridlines">
-            <i></i>
-            <i></i>
-            <i></i>
-            <i></i>
-            <i></i>
-            <i></i>
-          </div>
-          <div class="bars">
-            <% @chart_dates.each do |date| %>
-              <% log = @chart_logs[date] %>
-              <i style="--height:<%= log ? [[log.actual_sleep_time.to_f / 600 * 100, 100].min, 0].max : 0 %>%" title="<%= log ? "#{log.actual_sleep_time / 60.0}時間" : "記録なし" %>"></i>
-            <% end %>
-          </div>
-          <div class="mood-line">
-            <% mood_points = @chart_dates.each_with_index.filter_map do |date, index|
-              log = @chart_logs[date]
-              log ? "#{(index + 0.5) * 100.0 / 7},#{(5 - log.condition) * 25}" : nil
-            end.join(" ") %>
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              <polyline points="<%= mood_points %>"></polyline>
-            </svg>
-            <% @chart_dates.each_with_index do |date, index| %>
-              <% log = @chart_logs[date] %>
-              <% if log %>
-                <i style="--x:<%= (index + 0.5) * 100.0 / 7 %>%;--y:<%= (5 - log.condition) * 25 %>%" title="<%= "目覚め・気分: #{log.condition} / 5" %>"></i>
+        <div class="chart-scroll">
+          <div class="chart-area" style="--chart-days:<%= @chart_dates.size %>;--chart-width:<%= @chart_dates.size * 100.0 / 7 %>%">
+            <div class="chart-gridlines">
+              <i></i>
+              <i></i>
+              <i></i>
+              <i></i>
+              <i></i>
+              <i></i>
+            </div>
+            <div class="bars">
+              <% @chart_dates.each do |date| %>
+                <% log = @chart_logs[date] %>
+                <i style="--height:<%= log ? [[log.actual_sleep_time.to_f / 600 * 100, 100].min, 0].max : 0 %>%" title="<%= log ? "#{log.actual_sleep_time / 60.0}時間" : "記録なし" %>"></i>
               <% end %>
-            <% end %>
-          </div>
-          <div class="chart-x-labels">
-            <% @chart_dates.each do |date| %>
-              <% log = @chart_logs[date] %>
-              <div class="chart-date-item">
-                <span class="medicine-mark" <%= "aria-label=\"昨夜の薬を服用\"" if log&.medicine_taken? %>><%= "💊" if log&.medicine_taken? %></span>
+            </div>
+            <div class="mood-line">
+              <% mood_points = @chart_dates.each_with_index.filter_map do |date, index|
+                log = @chart_logs[date]
+                log ? "#{(index + 0.5) * 100.0 / @chart_dates.size},#{(5 - log.condition) * 25}" : nil
+              end.join(" ") %>
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points="<%= mood_points %>"></polyline>
+              </svg>
+              <% @chart_dates.each_with_index do |date, index| %>
+                <% log = @chart_logs[date] %>
                 <% if log %>
-                  <%= link_to "#{l(date, format: "%-m/%-d")}(#{japanese_weekday(date)})", edit_sleep_log_path(log), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を編集" } %>
-                <% else %>
-                  <%= link_to "#{l(date, format: "%-m/%-d")}(#{japanese_weekday(date)})", new_sleep_log_path(date: date), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を作成" } %>
+                  <i style="--x:<%= (index + 0.5) * 100.0 / @chart_dates.size %>%;--y:<%= (5 - log.condition) * 25 %>%" title="<%= "目覚め・気分: #{log.condition} / 5" %>"></i>
                 <% end %>
-              </div>
-            <% end %>
+              <% end %>
+            </div>
+            <div class="chart-x-labels">
+              <% @chart_dates.each do |date| %>
+                <% log = @chart_logs[date] %>
+                <div class="chart-date-item">
+                  <span class="medicine-mark" <%= "aria-label=\"昨夜の薬を服用\"" if log&.medicine_taken? %>><%= "💊" if log&.medicine_taken? %></span>
+                  <% if log %>
+                    <%= link_to "#{l(date, format: "%-m/%-d")}(#{japanese_weekday(date)})", edit_sleep_log_path(log), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を編集" } %>
+                  <% else %>
+                    <%= link_to "#{l(date, format: "%-m/%-d")}(#{japanese_weekday(date)})", new_sleep_log_path(date: date), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を作成" } %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
           </div>
         </div>
       </div>

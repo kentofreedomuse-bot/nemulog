@@ -49,4 +49,8 @@ export default class extends Controller {
       this.closeModal()
     }
   }
+
+  changePeriod(event) {
+    event.currentTarget.form.requestSubmit()
+  }
 }

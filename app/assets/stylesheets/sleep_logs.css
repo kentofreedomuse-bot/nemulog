@@ -462,6 +462,10 @@ input[type="range"] {
   font-size: 11px;
 }
 
+.section-heading form {
+  margin: 0;
+}
+
 .trend-chart {
   display: flex;
   height: 218px;
@@ -485,19 +489,29 @@ input[type="range"] {
   white-space: nowrap;
 }
 
-.chart-area {
-  position: relative;
+.chart-scroll {
   flex: 1;
   min-width: 0;
   margin-left: 9px;
+  overflow-x: auto;
+}
+
+.chart-area {
+  position: relative;
+  width: var(--chart-width);
+  height: 100%;
   padding-bottom: 30px;
 }
 
 .chart-gridlines,
-.bars,
-.mood-line {
+.bars {
   position: absolute;
   inset: 0 0 30px;
+}
+
+.mood-line {
+  position: absolute;
+  inset: 5px 0 35px;
 }
 
 .chart-gridlines {
@@ -514,7 +528,7 @@ input[type="range"] {
 
 .bars {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(var(--chart-days), minmax(0, 1fr));
   align-items: end;
   gap: 10px;
   padding: 0 12px;
@@ -564,7 +578,7 @@ input[type="range"] {
   left: 0;
   right: 0;
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(var(--chart-days), minmax(0, 1fr));
   gap: 10px;
   padding: 0 12px;
   color: var(--muted);

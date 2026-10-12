@@ -3,12 +3,18 @@ class SleepLogsController < ApplicationController
   before_action :set_sleep_log, only: [:edit, :update]
 
   def index
-    @chart_dates = (6.days.ago.to_date..Date.current).to_a
+    @month_offset = params[:month].to_s.match?(/\A[0-2]\z/) ? params[:month].to_i : 0
+    chart_month = Date.current.beginning_of_month - @month_offset.months
+    @chart_dates = chart_month.all_month.to_a
     @chart_logs = current_user.sleep_logs
                               .where(sleep_date: @chart_dates)
                               .order(:created_at)
                               .index_by(&:sleep_date)
-    @recent_logs = @chart_logs.values
+    @recent_logs = current_user.sleep_logs
+                               .where(sleep_date: 6.days.ago.to_date..Date.current)
+                               .order(:created_at)
+                               .index_by(&:sleep_date)
+                               .values
     @medicine_taken_logs = @recent_logs.select(&:medicine_taken?)
     @medicine_not_taken_logs = @recent_logs.reject(&:medicine_taken?)
     @medicine_taken_count = @medicine_taken_logs.count
