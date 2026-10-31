@@ -1,7 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["condition", "sleepinessValue", "toast", "modal"]
+  static targets = ["condition", "sleepinessValue", "toast", "modal", "medicineType", "medicineTypeSelect"]
+
+  connect() {
+    if (this.hasMedicineTypeTarget) this.toggleMedicineType()
+  }
+
+  toggleMedicineType() {
+    const taken = this.element.querySelector("input[name='sleep_log[medicine_taken]']:checked")?.value === "true"
+
+    this.medicineTypeTarget.hidden = !taken
+    if (!taken) this.medicineTypeSelectTarget.value = ""
+  }
 
   selectCondition(event) {
     const selectedButton = event.currentTarget

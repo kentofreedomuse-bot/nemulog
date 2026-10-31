@@ -26,8 +26,12 @@
 				<fieldset class="medicine-fieldset">
 					<legend>昨夜のお薬</legend>
 					<div class="choice-grid two-columns">
-						<label class="choice-card"><%= form.radio_button :medicine_taken, true %><span>💊服用した</span></label>
-						<label class="choice-card"><%= form.radio_button :medicine_taken, false %><span>服用しなかった</span></label>
+						<label class="choice-card"><%= form.radio_button :medicine_taken, true, data: { action: "change->sleep-log#toggleMedicineType" } %><span>💊服用した</span></label>
+						<label class="choice-card"><%= form.radio_button :medicine_taken, false, data: { action: "change->sleep-log#toggleMedicineType" } %><span>服用しなかった</span></label>
+					</div>
+					<div class="medicine-type-field" data-sleep-log-target="medicineType" <%= "hidden" unless @sleep_log.medicine_taken? %>>
+						<%= form.label :medicine_type, "薬の種類" %>
+						<%= form.select :medicine_type, options_for_select(SleepLog::MEDICINE_TYPES, @sleep_log.medicine_type), { prompt: "選択してください" }, class: "sleep-duration-select", data: { sleep_log_target: "medicineTypeSelect" } %>
 					</div>
 				</fieldset>
 

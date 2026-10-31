@@ -36,4 +36,32 @@ class SleepLogsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".chart-date-item", count: previous_month.end_of_month.day
     assert_select ".chart-area[style*='--chart-days:#{previous_month.end_of_month.day}']"
   end
+
+  test "new form offers medicine types and saves the selected type" do
+    user = User.create!(nickname: "テスト", email: "medicine-type@example.com", password: "password123")
+    sign_in user
+
+    get new_sleep_log_path
+
+    assert_response :success
+    assert_select "label[for='sleep_log_medicine_type']", text: "薬の種類"
+    SleepLog::MEDICINE_TYPES.each do |medicine_type|
+      assert_select "select[name='sleep_log[medicine_type]'] option", text: medicine_type
+    end
+
+    assert_difference("SleepLog.count", 1) do
+      post sleep_logs_path, params: {
+        sleep_log: {
+          sleep_date: Date.current,
+          medicine_taken: "true",
+          medicine_type: "ベンゾジアゼピン系",
+          actual_sleep_time: 420,
+          condition: 3,
+          sleepiness: 2
+        }
+      }
+    end
+
+    assert_equal "ベンゾジアゼピン系", user.sleep_logs.last.medicine_type
+  end
 end

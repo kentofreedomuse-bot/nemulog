@@ -279,6 +279,11 @@ legend,
   border-radius: 12px;
 }
 
+.medicine-type-field {
+  margin-top: 14px;
+}
+
+.medicine-type-field label,
 .sleep-duration-fieldset label {
   display: block;
   margin-bottom: 9px;

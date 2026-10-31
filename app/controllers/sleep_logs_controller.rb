@@ -62,7 +62,7 @@ class SleepLogsController < ApplicationController
   end
 
   def sleep_log_params
-    params.require(:sleep_log).permit(:medicine_taken, :actual_sleep_time, :condition, :sleepiness, :sleep_date)
+    params.require(:sleep_log).permit(:medicine_taken, :medicine_type, :actual_sleep_time, :condition, :sleepiness, :sleep_date)
   end
 
   def requested_sleep_date
