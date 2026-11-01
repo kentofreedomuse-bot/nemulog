@@ -467,6 +467,12 @@ input[type="range"] {
   font-size: 11px;
 }
 
+.chart-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .section-heading form {
   margin: 0;
 }

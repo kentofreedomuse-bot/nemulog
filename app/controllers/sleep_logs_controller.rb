@@ -4,12 +4,14 @@ class SleepLogsController < ApplicationController
 
   def index
     @month_offset = params[:month].to_s.match?(/\A[0-2]\z/) ? params[:month].to_i : 0
+    @medicine_filter = %w[all taken not_taken].include?(params[:medicine]) ? params[:medicine] : "all"
     chart_month = Date.current.beginning_of_month - @month_offset.months
     @chart_dates = chart_month.all_month.to_a
-    @chart_logs = current_user.sleep_logs
-                              .where(sleep_date: @chart_dates)
-                              .order(:created_at)
-                              .index_by(&:sleep_date)
+    chart_logs = current_user.sleep_logs.where(sleep_date: @chart_dates).order(:created_at)
+    @chart_logs = chart_logs.index_by(&:sleep_date)
+    visible_chart_logs = @medicine_filter == "all" ? chart_logs : chart_logs.where(medicine_taken: @medicine_filter == "taken")
+    @visible_chart_logs = visible_chart_logs.index_by(&:sleep_date)
+    @chart_dates = @medicine_filter == "all" ? @chart_dates : @visible_chart_logs.keys.sort
     @recent_logs = current_user.sleep_logs
                                .where(sleep_date: 6.days.ago.to_date..Date.current)
                                .order(:created_at)

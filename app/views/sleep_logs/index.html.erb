@@ -28,7 +28,12 @@
         <div>
           <h2><span class="heading-icon indigo">⌁</span> <%= ["今月", "先月", "先々月"][@month_offset] %>の睡眠と気分の変化</h2><p>💊 マークは薬を服用した日です</p>
         </div>
-        <%= form_with url: root_path, method: :get, local: true do %>
+        <%= form_with url: root_path, method: :get, local: true, class: "chart-filters" do %>
+          <%= select_tag :medicine,
+            options_for_select([["全て", "all"], ["服用", "taken"], ["未服用", "not_taken"]], @medicine_filter),
+            class: "period-select",
+            aria: { label: "服薬状態" },
+            data: { action: "change->sleep-log#changePeriod" } %>
           <%= select_tag :month,
             options_for_select([["今月", 0], ["先月", 1], ["先々月", 2]], @month_offset),
             class: "period-select",
@@ -43,7 +48,7 @@
           <% end %>
         </div>
         <div class="chart-scroll">
-          <div class="chart-area" style="--chart-days:<%= @chart_dates.size %>;--chart-width:<%= @chart_dates.size * 100.0 / 7 %>%">
+          <div class="chart-area" style="--chart-days:<%= [@chart_dates.size, 1].max %>;--chart-width:<%= [@chart_dates.size, 7].max * 100.0 / 7 %>%">
             <div class="chart-gridlines">
               <i></i>
               <i></i>
@@ -54,20 +59,20 @@
             </div>
             <div class="bars">
               <% @chart_dates.each do |date| %>
-                <% log = @chart_logs[date] %>
+                <% log = @visible_chart_logs[date] %>
                 <i style="--height:<%= log ? [[log.actual_sleep_time.to_f / 600 * 100, 100].min, 0].max : 0 %>%" title="<%= log ? "#{log.actual_sleep_time / 60.0}時間" : "記録なし" %>"></i>
               <% end %>
             </div>
             <div class="mood-line">
               <% mood_points = @chart_dates.each_with_index.filter_map do |date, index|
-                log = @chart_logs[date]
+                log = @visible_chart_logs[date]
                 log ? "#{(index + 0.5) * 100.0 / @chart_dates.size},#{(5 - log.condition) * 25}" : nil
               end.join(" ") %>
               <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                 <polyline points="<%= mood_points %>"></polyline>
               </svg>
               <% @chart_dates.each_with_index do |date, index| %>
-                <% log = @chart_logs[date] %>
+                <% log = @visible_chart_logs[date] %>
                 <% if log %>
                   <i style="--x:<%= (index + 0.5) * 100.0 / @chart_dates.size %>%;--y:<%= (5 - log.condition) * 25 %>%" title="<%= "目覚め・気分: #{log.condition} / 5" %>"></i>
                 <% end %>
@@ -76,8 +81,9 @@
             <div class="chart-x-labels">
               <% @chart_dates.each do |date| %>
                 <% log = @chart_logs[date] %>
+                <% visible_log = @visible_chart_logs[date] %>
                 <div class="chart-date-item">
-                  <span class="medicine-mark" <%= "aria-label=\"昨夜の薬を服用\"" if log&.medicine_taken? %>><%= "💊" if log&.medicine_taken? %></span>
+                  <span class="medicine-mark" <%= "aria-label=\"昨夜の薬を服用\"" if visible_log&.medicine_taken? %>><%= "💊" if visible_log&.medicine_taken? %></span>
                   <% if log %>
                     <%= link_to "#{l(date, format: "%-m/%-d")}(#{japanese_weekday(date)})", edit_sleep_log_path(log), class: "chart-date-link", aria: { label: "#{l(date, format: "%-m月%-d日")}の記録を編集" } %>
                   <% else %>

@@ -37,6 +37,54 @@ class SleepLogsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".chart-area[style*='--chart-days:#{previous_month.end_of_month.day}']"
   end
 
+  test "index filters chart records by medicine status and keeps the month selection" do
+    user = User.create!(nickname: "テスト", email: "chart-medicine@example.com", password: "password123")
+    taken_log = user.sleep_logs.create!(
+      sleep_date: Date.current,
+      sleep_time: Time.current,
+      wake_time: Time.current,
+      actual_sleep_time: 450,
+      sleep_quality: 2,
+      condition: 2,
+      sleepiness: 1,
+      medicine_taken: true
+    )
+    not_taken_log = user.sleep_logs.create!(
+      sleep_date: Date.current - 1.day,
+      sleep_time: Time.current,
+      wake_time: Time.current,
+      actual_sleep_time: 420,
+      sleep_quality: 3,
+      condition: 3,
+      sleepiness: 2,
+      medicine_taken: false
+    )
+    sign_in user
+
+    get root_path, params: { medicine: "taken", month: "0" }
+
+    assert_response :success
+    assert_select "select[name='medicine'] option[selected]", text: "服用"
+    assert_select "select[name='month'] option[selected]", text: "今月"
+    assert_select "a[href='#{edit_sleep_log_path(taken_log)}']"
+    assert_select "a[href='#{edit_sleep_log_path(not_taken_log)}']", count: 0
+    assert_select ".chart-date-item", count: 1
+    assert_select ".chart-area[style*='--chart-days:1'][style*='--chart-width:100.0%']"
+    assert_select ".bars i[title='7.5時間']", count: 1
+    assert_select ".bars i[title='7.0時間']", count: 0
+
+    get root_path, params: { medicine: "not_taken", month: "0" }
+
+    assert_response :success
+    assert_select "select[name='medicine'] option[selected]", text: "未服用"
+    assert_select "a[href='#{edit_sleep_log_path(not_taken_log)}']"
+    assert_select "a[href='#{edit_sleep_log_path(taken_log)}']", count: 0
+    assert_select ".chart-date-item", count: 1
+    assert_select ".chart-area[style*='--chart-days:1'][style*='--chart-width:100.0%']"
+    assert_select ".bars i[title='7.0時間']", count: 1
+    assert_select ".bars i[title='7.5時間']", count: 0
+  end
+
   test "new form offers medicine types and saves the selected type" do
     user = User.create!(nickname: "テスト", email: "medicine-type@example.com", password: "password123")
     sign_in user
